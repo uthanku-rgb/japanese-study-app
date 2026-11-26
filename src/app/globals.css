@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-cream-50: #FDFBF6;
+  --color-cream-100: #FAF6EF;
+  --color-cream-200: #F2EBDD;
+  --color-ink-900: #2D2520;
+  --color-ink-700: #5B4E42;
+  --color-ink-500: #8A7B6E;
+  --color-ink-300: #B8ADA2;
+  --color-sage-100: #E8F0E4;
+  --color-sage-300: #BECEB0;
+  --color-sage-500: #8FA37F;
+  --color-sage-700: #5F7352;
+  --color-rose-100: #F5E6E0;
+  --color-rose-300: #E8C4B8;
+  --color-rose-500: #C89A8E;
+  --color-honey-100: #F5E8D4;
+  --color-honey-500: #D4A574;
+  --color-lavender-100: #EDE5F5;
+  --color-lavender-400: #C3B1E1;
+
+  --color-background: var(--color-cream-100);
+  --color-foreground: var(--color-ink-900);
+  --color-card: var(--color-cream-50);
+  --color-card-foreground: var(--color-ink-900);
+  --color-primary: var(--color-sage-500);
+  --color-primary-foreground: var(--color-cream-50);
+  --color-border: var(--color-cream-200);
+  --color-ring: var(--color-sage-500);
+
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  --font-serif: 'Noto Serif KR', 'Batang', serif;
+  --font-heading: 'Gowun Dodum', 'Noto Serif KR', serif;
+}
+
+.paper-texture {
+  background-image: radial-gradient(circle at 1px 1px, rgba(93, 73, 56, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fade-in 0.25s ease-out both; }
+.fade-up { animation: fade-up 0.35s ease-out both; }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-cream-200);
+  border-radius: 3px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    background: var(--color-cream-100);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
