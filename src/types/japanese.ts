@@ -78,8 +78,9 @@ export interface QuizWrongWord {
 }
 
 // Keep references so Chrome/Safari don't GC active utterances or audio
-let activeAudio: HTMLAudioElement | null = null;
+let sharedAudio: HTMLAudioElement | null = null;
 let activeUtterance: SpeechSynthesisUtterance | null = null;
+let watchdogTimer: number | null = null;
 let cachedVoices: SpeechSynthesisVoice[] = [];
 let voicesInitialized = false;
 
@@ -106,11 +107,25 @@ function getJapaneseVoice(): SpeechSynthesisVoice | null {
     v.lang.toLowerCase().replace("_", "-").startsWith("ja")
   );
   if (jaVoices.length === 0) return null;
-  // Prefer Google / Natural / Kyoko / Nanami / Haruka voices
   return (
     jaVoices.find((v) => /google|natural|nanami|kyoko|o-ren/i.test(v.name)) ||
     jaVoices[0]
   );
+}
+
+function getSharedAudio(): HTMLAudioElement | null {
+  if (typeof window === "undefined") return null;
+  if (!sharedAudio) {
+    sharedAudio = new Audio();
+  }
+  return sharedAudio;
+}
+
+function clearWatchdog() {
+  if (watchdogTimer !== null && typeof window !== "undefined") {
+    window.clearTimeout(watchdogTimer);
+    watchdogTimer = null;
+  }
 }
 
 function playFallbackAudio(
@@ -118,42 +133,43 @@ function playFallbackAudio(
   onEnd?: () => void,
   onError?: () => void
 ) {
-  if (typeof window === "undefined") {
+  const audio = getSharedAudio();
+  if (!audio) {
     onError?.();
     return;
   }
+  const clean = text.trim();
+  if (!clean) {
+    onEnd?.();
+    return;
+  }
   try {
-    if (activeAudio) {
-      activeAudio.pause();
-      activeAudio = null;
-    }
-    const clean = text.trim();
-    if (!clean) {
-      onEnd?.();
-      return;
-    }
+    audio.pause();
+    audio.onended = null;
+    audio.onerror = null;
+
     const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ja&q=${encodeURIComponent(
       clean
     )}`;
-    const audio = new Audio();
-    // Prevent Referer blocking
-    (audio as HTMLAudioElement & { referrerPolicy?: string }).referrerPolicy =
-      "no-referrer";
     audio.src = url;
     audio.playbackRate = 0.95;
-    activeAudio = audio;
+
     audio.onended = () => {
-      if (activeAudio === audio) activeAudio = null;
+      audio.onended = null;
+      audio.onerror = null;
       onEnd?.();
     };
     audio.onerror = () => {
-      if (activeAudio === audio) activeAudio = null;
+      audio.onended = null;
+      audio.onerror = null;
       onError?.();
     };
-    const playPromise = audio.play();
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {
-        if (activeAudio === audio) activeAudio = null;
+
+    const p = audio.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {
+        audio.onended = null;
+        audio.onerror = null;
         onError?.();
       });
     }
@@ -163,14 +179,15 @@ function playFallbackAudio(
 }
 
 export function stopJapaneseSpeech() {
-  if (activeAudio) {
+  clearWatchdog();
+  if (sharedAudio) {
     try {
-      activeAudio.pause();
-      activeAudio.currentTime = 0;
+      sharedAudio.pause();
+      sharedAudio.onended = null;
+      sharedAudio.onerror = null;
     } catch {
       // ignore
     }
-    activeAudio = null;
   }
   activeUtterance = null;
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -198,8 +215,7 @@ export function speakJapanese(
   const hasSpeech = "speechSynthesis" in window;
   const jaVoice = hasSpeech ? getJapaneseVoice() : null;
 
-  // If browser/OS has no Japanese voice installed (common on Korean Windows),
-  // immediately use cloud TTS audio fallback so sound always plays.
+  // If no Japanese voice is installed on the device, immediately play cloud TTS audio
   if (!hasSpeech || !jaVoice) {
     playFallbackAudio(clean, options?.onEnd, options?.onError);
     return;
@@ -212,31 +228,49 @@ export function speakJapanese(
     utterance.rate = options?.rate ?? 0.9;
     activeUtterance = utterance;
 
+    let started = false;
     let finished = false;
-    utterance.onend = () => {
+
+    const triggerFallback = () => {
       if (finished) return;
       finished = true;
+      clearWatchdog();
       if (activeUtterance === utterance) activeUtterance = null;
-      options?.onEnd?.();
-    };
-    utterance.onerror = () => {
-      if (finished) return;
-      finished = true;
-      if (activeUtterance === utterance) activeUtterance = null;
-      // Fallback to audio if Web Speech fails
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // ignore
+      }
       playFallbackAudio(clean, options?.onEnd, options?.onError);
     };
 
-    // Chrome sometimes pauses speechSynthesis or drops speak() right after cancel()
+    utterance.onstart = () => {
+      started = true;
+      clearWatchdog();
+    };
+
+    utterance.onend = () => {
+      if (finished) return;
+      finished = true;
+      clearWatchdog();
+      if (activeUtterance === utterance) activeUtterance = null;
+      options?.onEnd?.();
+    };
+
+    utterance.onerror = () => {
+      triggerFallback();
+    };
+
+    // Speak synchronously inside user gesture so iOS/Android never block it
     window.speechSynthesis.resume();
-    window.setTimeout(() => {
-      try {
-        window.speechSynthesis.resume();
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        playFallbackAudio(clean, options?.onEnd, options?.onError);
+    window.speechSynthesis.speak(utterance);
+
+    // Watchdog: if Chrome/browser silently hangs without starting within 900ms, switch to cloud audio
+    watchdogTimer = window.setTimeout(() => {
+      if (!started && !finished) {
+        triggerFallback();
       }
-    }, 30);
+    }, 900);
   } catch {
     playFallbackAudio(clean, options?.onEnd, options?.onError);
   }
