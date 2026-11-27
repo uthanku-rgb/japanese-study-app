@@ -14,6 +14,8 @@ import {
   stopJapaneseSpeech,
 } from "@/types/japanese";
 import ProfileGate from "@/components/ProfileGate";
+import FuriganaText from "@/components/FuriganaText";
+import GrammarCheatSheet from "@/components/GrammarCheatSheet";
 import {
   BookOpen,
   MessageSquare,
@@ -27,6 +29,8 @@ import {
   RotateCw,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Check,
   Shuffle,
   List,
@@ -87,6 +91,8 @@ export default function JapaneseStudyApp() {
   const [shuffledIds, setShuffledIds] = useState<string[] | null>(null);
   const [cardIndex, setCardIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [showFurigana, setShowFurigana] = useState(true);
+  const [expandedExamples, setExpandedExamples] = useState<Record<number, boolean>>({});
 
   // Touch swipe states for mobile flashcards
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -300,7 +306,7 @@ export default function JapaneseStudyApp() {
     setQuizPhase("ready");
   };
 
-  // Dialogue sequential playback
+  // Dialogue sequential playback (uses speakJapanese with automatic audio fallback)
   const handlePlayAllDialogues = () => {
     const dialogues = currentLesson?.dialogues || [];
     if (dialogues.length === 0) return;
@@ -311,26 +317,17 @@ export default function JapaneseStudyApp() {
       return;
     }
 
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const voices = window.speechSynthesis.getVoices();
-    const jaVoice = voices.find((v) => v.lang.toLowerCase().startsWith("ja"));
-
     const speakNext = (idx: number) => {
       if (idx >= dialogues.length) {
         setPlayingLineIdx(null);
         return;
       }
       setPlayingLineIdx(idx);
-      const u = new SpeechSynthesisUtterance(
-        dialogues[idx].reading || dialogues[idx].jp
-      );
-      u.lang = "ja-JP";
-      u.rate = 0.88;
-      if (jaVoice) u.voice = jaVoice;
-      u.onend = () => speakNext(idx + 1);
-      u.onerror = () => setPlayingLineIdx(null);
-      window.speechSynthesis.speak(u);
+      speakJapanese(dialogues[idx].reading || dialogues[idx].jp, {
+        rate: 0.88,
+        onEnd: () => speakNext(idx + 1),
+        onError: () => setPlayingLineIdx(null),
+      });
     };
 
     speakNext(0);
@@ -521,6 +518,13 @@ export default function JapaneseStudyApp() {
       </div>
     );
   }
+
+  const scrollToGrammarItem = (idx: number) => {
+    const el = document.getElementById(`grammar-item-${idx}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   const dialogues = currentLesson.dialogues || [];
   const grammarItems = currentLesson.grammar_items || [];
@@ -760,52 +764,107 @@ export default function JapaneseStudyApp() {
 
         {/* 3-B. 핵심 문법 */}
         {activeTab === "grammar" && (
-          <div className="space-y-4 fade-in">
-            {grammarItems.map((g, idx) => (
-              <div
-                key={`${g.pattern}-${idx}`}
-                className="bg-cream-50 border border-cream-200 rounded-2xl p-5 space-y-3.5"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="w-7 h-7 rounded-xl bg-sage-500 text-cream-50 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                    {idx + 1}
-                  </span>
-                  <div className="space-y-1.5">
-                    <h3 className="text-base sm:text-lg font-bold text-ink-900">
-                      {g.pattern}
-                    </h3>
-                    <p className="text-sm text-ink-700 leading-relaxed">
-                      {g.summary}
-                    </p>
-                  </div>
-                </div>
+          <div className="space-y-5 fade-in">
+            <GrammarCheatSheet
+              key={currentLesson.id}
+              lessonNumber={currentLesson.lesson_number}
+              lessonLabel={lessonLabel}
+              grammarItems={grammarItems}
+              onJumpToItem={scrollToGrammarItem}
+            />
 
-                {g.examples?.length > 0 && (
-                  <div className="space-y-2 sm:pl-10">
-                    {g.examples.map((ex, exIdx) => (
-                      <div
-                        key={exIdx}
-                        onClick={() => speakJapanese(ex.reading || ex.jp)}
-                        className="cursor-pointer bg-cream-100 hover:bg-sage-100/50 border border-cream-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 transition-colors"
-                      >
-                        <div className="space-y-0.5">
-                          <div className="text-sm sm:text-base font-semibold text-ink-900">
-                            {ex.jp}
-                          </div>
-                          <div className="text-xs sm:text-sm text-ink-500">
-                            {ex.ko}
-                          </div>
-                        </div>
-                        <Volume2
-                          size={16}
-                          className="text-sage-700 shrink-0 opacity-75"
-                        />
+            <div className="flex items-center justify-between pt-1 px-1">
+              <h3 className="text-xs font-bold text-ink-500 tracking-wide">
+                상세 문법 설명 & 예문 ({grammarItems.length}개)
+              </h3>
+            </div>
+
+            <div className="space-y-4">
+              {grammarItems.map((g, idx) => {
+                const totalExamples = g.examples?.length || 0;
+                const isExpanded = !!expandedExamples[idx];
+                const visibleExamples =
+                  totalExamples > 6 && !isExpanded
+                    ? g.examples.slice(0, 5)
+                    : g.examples || [];
+
+                return (
+                  <div
+                    key={`${g.pattern}-${idx}`}
+                    id={`grammar-item-${idx}`}
+                    className="scroll-mt-20 bg-cream-50 border border-cream-200 rounded-2xl p-5 space-y-3.5"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="w-7 h-7 rounded-xl bg-sage-500 text-cream-50 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <div className="space-y-1.5">
+                        <h3 className="text-base sm:text-lg font-bold text-ink-900">
+                          {g.pattern}
+                        </h3>
+                        <p className="text-sm text-ink-700 leading-relaxed">
+                          {g.summary}
+                        </p>
                       </div>
-                    ))}
+                    </div>
+
+                    {totalExamples > 0 && (
+                      <div className="space-y-2 sm:pl-10">
+                        {visibleExamples.map((ex, exIdx) => (
+                          <div
+                            key={exIdx}
+                            onClick={() => speakJapanese(ex.reading || ex.jp)}
+                            className="cursor-pointer bg-cream-100 hover:bg-sage-100/50 border border-cream-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 transition-colors"
+                          >
+                            <div className="space-y-0.5">
+                              <div className="text-sm sm:text-base font-semibold text-ink-900">
+                                {ex.jp}
+                              </div>
+                              {ex.reading && ex.reading !== ex.jp && (
+                                <div className="text-xs text-sage-700">
+                                  {ex.reading}
+                                </div>
+                              )}
+                              <div className="text-xs sm:text-sm text-ink-500">
+                                {ex.ko}
+                              </div>
+                            </div>
+                            <Volume2
+                              size={16}
+                              className="text-sage-700 shrink-0 opacity-75"
+                            />
+                          </div>
+                        ))}
+
+                        {totalExamples > 6 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedExamples((prev) => ({
+                                ...prev,
+                                [idx]: !prev[idx],
+                              }))
+                            }
+                            className="w-full py-2 rounded-xl bg-cream-100 hover:bg-cream-200 border border-cream-200 text-xs font-semibold text-ink-700 inline-flex items-center justify-center gap-1 transition-colors"
+                          >
+                            {isExpanded ? (
+                              <>
+                                예문 접기 <ChevronUp size={14} />
+                              </>
+                            ) : (
+                              <>
+                                예문 {totalExamples - 5}개 더 보기{" "}
+                                <ChevronDown size={14} />
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -846,6 +905,17 @@ export default function JapaneseStudyApp() {
                   }`}
                 >
                   못 외운 단어만
+                </button>
+
+                <button
+                  onClick={() => setShowFurigana((v) => !v)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
+                    showFurigana
+                      ? "bg-sage-100 text-sage-700 border-sage-300"
+                      : "bg-cream-50 text-ink-500 border-cream-200 hover:border-sage-300"
+                  }`}
+                >
+                  한자 독음 {showFurigana ? "ON" : "OFF"}
                 </button>
 
                 {cardView === "card" && (
@@ -930,8 +1000,13 @@ export default function JapaneseStudyApp() {
 
                   {!flipped ? (
                     <>
-                      <div className="text-4xl sm:text-5xl font-bold text-ink-900 tracking-wide mb-6">
-                        {currentCard.word}
+                      <div className="text-4xl sm:text-5xl font-bold text-ink-900 tracking-wide mb-6 leading-snug">
+                        <FuriganaText
+                          word={currentCard.word}
+                          reading={currentCard.reading}
+                          showFurigana={showFurigana}
+                          rtClassName="text-[0.38em] font-medium text-sage-700 tracking-normal select-none"
+                        />
                       </div>
                       <button
                         type="button"
@@ -947,8 +1022,13 @@ export default function JapaneseStudyApp() {
                     </>
                   ) : (
                     <div className="space-y-4 fade-in">
-                      <div className="text-xl text-ink-500 font-medium">
-                        {currentCard.word}
+                      <div className="text-2xl text-ink-700 font-semibold leading-snug">
+                        <FuriganaText
+                          word={currentCard.word}
+                          reading={currentCard.reading}
+                          showFurigana={true}
+                          rtClassName="text-[0.48em] font-medium text-sage-700 tracking-normal select-none"
+                        />
                       </div>
                       <div className="text-2xl sm:text-3xl font-bold text-ink-900 leading-snug">
                         {currentCard.meaning}
@@ -1041,8 +1121,13 @@ export default function JapaneseStudyApp() {
                         />
                         <div className="min-w-0">
                           <div className="flex items-baseline gap-2 flex-wrap">
-                            <span className="text-base font-bold text-ink-900">
-                              {v.word}
+                            <span className="text-base font-bold text-ink-900 leading-relaxed">
+                              <FuriganaText
+                                word={v.word}
+                                reading={v.reading}
+                                showFurigana={showFurigana}
+                                rtClassName="text-[0.62em] font-medium text-sage-700 tracking-normal select-none"
+                              />
                             </span>
                             <span className="text-[11px] text-ink-500">
                               {v.category}
@@ -1257,7 +1342,12 @@ export default function JapaneseStudyApp() {
                           className="py-2 flex items-center justify-between text-sm gap-2"
                         >
                           <span className="font-semibold text-ink-900">
-                            {w.word}
+                            <FuriganaText
+                              word={w.word}
+                              reading={w.reading}
+                              showFurigana={true}
+                              rtClassName="text-[0.65em] font-medium text-rose-500 select-none"
+                            />
                           </span>
                           <span className="text-ink-700 text-right">
                             {w.meaning}
