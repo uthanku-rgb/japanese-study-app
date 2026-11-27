@@ -40,6 +40,420 @@ interface LessonCheatSheet {
 }
 
 const LESSON_CHEAT_SHEETS: Record<number, LessonCheatSheet> = {
+  1: {
+    headline:
+      "명사 + です / ですか / じゃ ありません — 자기소개 3종 세트",
+    sections: [
+      {
+        title: "1. 명사 문장 정중 3단 변형",
+        tone: "sage",
+        columns: 2,
+        items: [
+          {
+            badge: "긍정 정중",
+            formula: "A は 명사 + です",
+            meaning: "A는 ~입니다",
+            example: "わたしは がくせいです。",
+            tip: "조사 は는 '와(wa)'로 발음",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "의문 정중",
+            formula: "명사 + ですか",
+            meaning: "~입니까?",
+            example: "ユリさんは がくせいですか。",
+            jumpToIndex: 2,
+          },
+          {
+            badge: "부정 정중",
+            formula: "명사 + じゃ(では) ありません",
+            meaning: "~이/가 아닙니다",
+            example: "かいしゃいんじゃ ありません。",
+            tip: "회화에서는 じゃ가 더 자주 쓰임",
+            jumpToIndex: 3,
+          },
+          {
+            badge: "대답",
+            formula: "はい、そうです / いいえ、~じゃ ありません",
+            meaning: "네, 그렇습니다 / 아니요, ~이/가 아닙니다",
+            jumpToIndex: 2,
+          },
+        ],
+      },
+      {
+        title: "2. 인칭 대명사 & 소개",
+        tone: "honey",
+        columns: 2,
+        items: [
+          {
+            badge: "1인칭",
+            formula: "わたし / ぼく",
+            meaning: "나, 저",
+            tip: "ぼく는 주로 남성이 사용",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "2인칭",
+            formula: "あなた",
+            meaning: "너, 당신",
+            tip: "윗사람에게 쓰면 무례! 이름 + さん/직책으로",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "3인칭",
+            formula: "かれ / かのじょ",
+            meaning: "그 / 그녀 (남자친구 / 여자친구)",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "소개",
+            formula: "こちらは ~さんです",
+            meaning: "이 분은 ~씨예요",
+            tip: "こちら = 이쪽, 이 분, 나",
+            jumpToIndex: 1,
+          },
+        ],
+      },
+      {
+        title: "3. 첫 만남 인사",
+        tone: "lavender",
+        columns: 2,
+        items: [
+          {
+            badge: "첫인사",
+            formula: "はじめまして。",
+            meaning: "처음 뵙겠습니다",
+            jumpToIndex: 4,
+          },
+          {
+            badge: "부탁",
+            formula: "どうぞ よろしく おねがいします。",
+            meaning: "아무쪼록 잘 부탁드립니다",
+            tip: "줄여서 どうぞ よろしく / よろしく おねがいします",
+            jumpToIndex: 4,
+          },
+          {
+            badge: "답례",
+            formula: "こちらこそ よろしく おねがいします。",
+            meaning: "저야말로 잘 부탁드립니다",
+            jumpToIndex: 4,
+          },
+          {
+            badge: "저녁 인사",
+            formula: "こんばんは",
+            meaning: "안녕하세요 (저녁)",
+            tip: "は는 '와'로 발음",
+            jumpToIndex: 0,
+          },
+        ],
+      },
+    ],
+  },
+  2: {
+    headline:
+      "こ·そ·あ·ど + の 3가지 용법 — 가리키고, 꾸미고, 대신한다!",
+    sections: [
+      {
+        title: "1. こ·そ·あ·ど 지시어 한눈에",
+        tone: "sage",
+        columns: 2,
+        items: [
+          {
+            badge: "사물 지시 대명사",
+            formula: "これ / それ / あれ / どれ",
+            meaning: "이것 / 그것 / 저것 / 어느 것",
+            example: "これは なんですか。",
+            tip: "단독으로 쓰임",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "명사 수식 지시어",
+            formula: "この / その / あの / どの + 명사",
+            meaning: "이 / 그 / 저 / 어느 + 명사",
+            example: "その はこは なんですか。",
+            tip: "반드시 뒤에 명사가 와야 함",
+            jumpToIndex: 2,
+          },
+          {
+            badge: "위치 기준",
+            formula: "こ(나 근처) · そ(상대 근처) · あ(둘 다 멀리) · ど(의문)",
+            meaning: "말하는 사람·듣는 사람·사물의 위치로 구별",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "의문사",
+            formula: "なん(무엇) / だれ(누구)",
+            meaning: "사물은 なん, 사람은 だれ",
+            example: "その かたは だれですか。",
+            jumpToIndex: 2,
+          },
+        ],
+      },
+      {
+        title: "2. 조사 の · も",
+        tone: "honey",
+        columns: 3,
+        items: [
+          {
+            badge: "명사 연결",
+            formula: "명사 + の + 명사",
+            meaning: "~의 (생산지·재료·소유·소속)",
+            example: "おこめの おかし",
+            tip: "우리말로 해석 안 될 때가 많음",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "대체 명사",
+            formula: "명사 + の(です)",
+            meaning: "~(의) 것(입니다)",
+            example: "これは みゆきさんのです。",
+            tip: "뒤의 명사를 생략하고 の로 대신",
+            jumpToIndex: 3,
+          },
+          {
+            badge: "~도",
+            formula: "명사 + も",
+            meaning: "앞과 같은 종류임을 나타냄",
+            example: "これも おこめの おかしです。",
+            tip: "は 자리에 も가 들어감",
+            jumpToIndex: 1,
+          },
+        ],
+      },
+      {
+        title: "3. どうぞ ↔ どうも",
+        tone: "lavender",
+        columns: 2,
+        items: [
+          {
+            badge: "권할 때",
+            formula: "どうぞ",
+            meaning: "여기 있습니다 / 앉으세요 / 드세요",
+            jumpToIndex: 4,
+          },
+          {
+            badge: "받을 때",
+            formula: "どうも (ありがとうございます)",
+            meaning: "감사합니다 (정말 감사합니다)",
+            tip: "どうも 단독으로도 감사 표현",
+            jumpToIndex: 4,
+          },
+        ],
+      },
+    ],
+  },
+  3: {
+    headline:
+      "명사 정중체 4종 완성 — です / じゃ ありません / でした / じゃ ありませんでした",
+    sections: [
+      {
+        title: "1. 명사 정중 표현 4단 변형",
+        tone: "sage",
+        columns: 2,
+        items: [
+          {
+            badge: "현재 긍정",
+            formula: "명사 + です",
+            meaning: "~입니다",
+            example: "がくせいです。",
+            jumpToIndex: 3,
+          },
+          {
+            badge: "현재 부정",
+            formula: "명사 + じゃ(では) ありません",
+            meaning: "~이/가 아닙니다",
+            example: "がくせいじゃ ありません。",
+            jumpToIndex: 3,
+          },
+          {
+            badge: "과거 긍정",
+            formula: "명사 + でした",
+            meaning: "~였습니다 / ~이었습니다",
+            example: "きのうも はれでした。",
+            tip: "의문문은 でしたか",
+            jumpToIndex: 2,
+          },
+          {
+            badge: "과거 부정",
+            formula: "명사 + じゃ(では) ありませんでした",
+            meaning: "~이/가 아니었습니다",
+            example: "きのうは やすみじゃ ありませんでした。",
+            tip: "ありません + でした",
+            jumpToIndex: 3,
+          },
+        ],
+      },
+      {
+        title: "2. 시간·분 읽기 주의",
+        tone: "honey",
+        columns: 2,
+        items: [
+          {
+            badge: "숫자 두 가지 읽기",
+            formula: "4 し/よん · 7 しち/なな · 9 きゅう/く · 0 ゼロ/れい/まる",
+            meaning: "쓰임에 따라 읽기가 달라짐",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "~시 (じ)",
+            formula: "よじ(4시) · しちじ(7시) · くじ(9시)",
+            meaning: "몇 시 = なんじ",
+            tip: "よんじ·ななじ·きゅうじ ✕",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "~분 (ぷん)",
+            formula: "いっぷん · さんぷん · よんぷん · ろっぷん · はっぷん · じゅっぷん",
+            meaning: "1·3·4·6·8·10분은 ぷん, 나머지는 ふん",
+            example: "ごぜん くじ はっぷんです。",
+            tip: "몇 분 = なんぷん / 30분 = はん",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "전화번호",
+            formula: "한 자씩 읽기 + '-'는 の",
+            meaning: "2·5는 にー·ごー로 늘려 읽음",
+            example: "ゼロにーの さんよんごーろくの …",
+            jumpToIndex: 1,
+          },
+        ],
+      },
+      {
+        title: "3. 때 표현 + 조사",
+        tone: "lavender",
+        columns: 2,
+        items: [
+          {
+            badge: "날",
+            formula: "おととい → きのう → きょう → あした → あさって",
+            meaning: "그저께 → 어제 → 오늘 → 내일 → 모레",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "해",
+            formula: "きょねん → ことし → らいねん",
+            meaning: "작년 → 올해 → 내년",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "~から / ~まで",
+            formula: "시작점 + から / 도착점 + まで",
+            meaning: "~부터 / ~까지",
+            example: "くじから かいぎです。",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "때 + は",
+            formula: "시간·때 명사 + は",
+            meaning: "'~에는'으로 해석되기도 함",
+            example: "きょねんは かいしゃいんじゃ ありませんでした。",
+            jumpToIndex: 3,
+          },
+        ],
+      },
+    ],
+  },
+  4: {
+    headline:
+      "い형용사는 어미 い가 열쇠 — 그대로 두면 수식·です, く로 바꾸면 くて·くない!",
+    sections: [
+      {
+        title: "1. い형용사 정중체 3단 변형",
+        tone: "sage",
+        columns: 2,
+        items: [
+          {
+            badge: "기본형·명사 수식",
+            formula: "～い + 명사",
+            meaning: "형태 변화 없이 그대로 명사를 꾸밈 (~ㄴ/은)",
+            example: "たかい やま (높은 산)",
+            tip: "기본형 = 명사 수식형",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "긍정 정중",
+            formula: "～い + です",
+            meaning: "~(습)니다",
+            example: "きょうは あついですね。",
+            tip: "끝에 ね를 붙이면 '~네요'",
+            jumpToIndex: 1,
+          },
+          {
+            badge: "부정 정중 ①",
+            formula: "～い → ～く ないです",
+            meaning: "~(하)지 않습니다",
+            example: "あまく ないです。",
+            jumpToIndex: 3,
+          },
+          {
+            badge: "부정 정중 ②",
+            formula: "～い → ～く ありません",
+            meaning: "~(하)지 않습니다 (ないです와 같은 뜻)",
+            example: "たかく ありません。",
+            jumpToIndex: 3,
+          },
+        ],
+      },
+      {
+        title: "2. 연결형(て형) ~くて",
+        tone: "honey",
+        columns: 2,
+        items: [
+          {
+            badge: "연결형",
+            formula: "～い → ～く + て",
+            meaning: "~(하)고, ~(해)서 — 중지·열거·원인",
+            example: "つめたくて おいしいです。",
+            jumpToIndex: 2,
+          },
+          {
+            badge: "열거 문장",
+            formula: "A は ～くて、B は ～いです",
+            meaning: "A는 ~하고 B는 ~합니다",
+            example: "なつは あつくて、ふゆは さむいです。",
+            jumpToIndex: 2,
+          },
+        ],
+      },
+      {
+        title: "3. 예외 주의! いい(좋다)는 よい로 활용",
+        tone: "rose",
+        columns: 2,
+        items: [
+          {
+            badge: "그대로 쓰는 곳",
+            formula: "いい / いい + 명사 / いいです",
+            meaning: "기본형·명사 수식·긍정 정중은 いい 그대로",
+            example: "いい てんき",
+            jumpToIndex: 0,
+          },
+          {
+            badge: "て형",
+            formula: "いい → よくて",
+            meaning: "좋고, 좋아서",
+            example: "てんきも よくて",
+            tip: "いくて ✕",
+            jumpToIndex: 2,
+          },
+          {
+            badge: "부정형",
+            formula: "いい → よく ない / よく ないです / よく ありません",
+            meaning: "좋지 않다 / 좋지 않습니다",
+            example: "きょうの てんきは よく ありません。",
+            tip: "いく ない ✕",
+            jumpToIndex: 3,
+          },
+          {
+            badge: "헷갈리는 짝",
+            formula: "あつ(暑)い ≠ あつ(熱)い / やさ(優)しい ≠ やさ(易)しい",
+            meaning: "덥다 vs 뜨겁다 / 상냥하다 vs 쉽다",
+            tip: "たかい는 '높다'와 '비싸다' 둘 다",
+            jumpToIndex: 0,
+          },
+        ],
+      },
+    ],
+  },
   5: {
     headline: "な형용사 4단 변형 · 기간 · 달력 핵심 공식",
     sections: [
