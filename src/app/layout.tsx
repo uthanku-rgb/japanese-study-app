@@ -1,18 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const BASE = process.env.NODE_ENV === "production" ? "/japanese-study-app" : "";
+
 export const metadata: Metadata = {
   title: "일본어 스터디 — 본문 · 문법 · 단어카드 · 퀴즈",
   description: "둘이서 함께 공부하는 일본어 본문, 핵심 문법, 단어카드, 퀴즈 앱",
-  manifest: "/manifest.json",
+  manifest: `${BASE}/manifest.json`,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "일본어 스터디",
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: `${BASE}/icon.svg`,
+    apple: `${BASE}/apple-touch-icon.png`,
   },
 };
 
@@ -37,7 +39,11 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap"
           rel="stylesheet"

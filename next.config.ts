@@ -1,14 +1,16 @@
 import type { NextConfig } from "next";
-import withPWAInit from "@ducanh2912/next-pwa";
 
-const withPWA = withPWAInit({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-});
+const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
+  output: "export",
+  basePath: isProd ? "/japanese-study-app" : "",
+  assetPrefix: isProd ? "/japanese-study-app/" : undefined,
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
   reactCompiler: true,
-  turbopack: {},
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;
